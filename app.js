@@ -1,3 +1,7 @@
+if(process.env.NODE_ENV != "production"){
+    require('dotenv').config();
+};
+
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -16,7 +20,8 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
 
-const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+ const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+ //const dbUrl=process.env.ATLASDB_URL;
 
 main()
     .then(() => {
@@ -38,7 +43,7 @@ app.engine('ejs', ejsMate);
 app.use(express.static(path.join(__dirname, "/public")));
 
 const sessionOptions = {
-    secret: "mysupersecretcode",
+    secret:process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
@@ -48,9 +53,10 @@ const sessionOptions = {
     }
 }
 
-app.get("/", (req, res) => {
-    res.send("Hello, I am root");
-});
+// app.get("/", (req, res) => {
+//     res.send("Hello, I am root");
+// });
+
 app.use(session(sessionOptions));
 app.use(flash());
 
@@ -70,16 +76,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// app.get("/demoUser", async(req,res)=>{
-//     let fakeUser = new User({
-//         email:"ram13@gmail.com",
-//         username :"delta-student",
-//     });
-
-//     let registerdUser = await User.register(fakeUser,"helloworld");
-//     res.send(registerdUser);
-// });
-
 app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
@@ -91,7 +87,7 @@ app.all("*", (req, res, next) => {
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something went wrong!" } = err;
     res.status(statusCode).render("error.ejs", { message })
-    //res.status(statusCode).send(message);
+    res.status(statusCode).send(message);
 });
 
 app.listen(8080, () => {
