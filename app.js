@@ -20,8 +20,8 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 
 
- const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
- //const dbUrl=process.env.ATLASDB_URL;
+ //const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
+ const dbUrl=process.env.ATLASDB_URL;
 
 main()
     .then(() => {
@@ -32,7 +32,7 @@ main()
     });
 
 async function main() {
-    await mongoose.connect(MONGO_URL);
+    await mongoose.connect(dbUrl);
 }
 
 app.set("view engine", "ejs");
@@ -47,15 +47,12 @@ const sessionOptions = {
     resave: false,
     saveUninitialized: true,
     cookie: {
-        expires: Date.now() * 7 * 24 * 60 * 60 * 1000,
+        expires:new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
     }
 }
 
-// app.get("/", (req, res) => {
-//     res.send("Hello, I am root");
-// });
 
 app.use(session(sessionOptions));
 app.use(flash());
@@ -86,8 +83,7 @@ app.all("*", (req, res, next) => {
 
 app.use((err, req, res, next) => {
     let { statusCode = 500, message = "Something went wrong!" } = err;
-    res.status(statusCode).render("error.ejs", { message })
-    res.status(statusCode).send(message);
+    res.status(statusCode).render("error.ejs", { message });
 });
 
 app.listen(8080, () => {
