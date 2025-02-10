@@ -28,7 +28,7 @@
     "passport-local-mongoose": "^8.0.0"
   },
   "engines": {
-    "node": "16.x"
+    "node": "22.x"
   }
 
 }
